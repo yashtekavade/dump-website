@@ -2,11 +2,15 @@
 {% block content %}
 <div class="wrap">
   <a class="back-link" href="/posts/">← all posts</a>
-  <h1>{{ page.get("title", title) }}</h1>
-  <div class="detail-meta">
-    <span>{{ page.get("date_day", "") }}</span>
-    {% if page.get("subject") %}<span>{{ page.get("subject") }}</span>{% endif %}
-  </div>
-  <article class="content">{{ content }}</article>
+  <article>
+    <h1>{{ page.get("title", title) }}</h1>
+    <div class="email-meta">
+      <p><span class="email-meta-key">Date:</span><span class="email-meta-value">{{ page.get("date_day", "") }}</span></p>
+      <p><span class="email-meta-key">From:</span><span class="email-meta-value">{{ page.get("from_html", "") }}</span></p>
+      <p><span class="email-meta-key">To:</span><span class="email-meta-value">{{ page.get("to", "You") }}</span></p>
+      <p><span class="email-meta-key">Subject:</span><span class="email-meta-value">{{ page.get("title", title) }}</span></p>
+    </div>
+    <div class="content">{{ content }}</div>
+  </article>
 </div>
 {% endblock %}

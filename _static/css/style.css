@@ -25,6 +25,20 @@
   --max-w-wide: 1040px;
 }
 
+:root[data-theme="dark"] {
+  --bg: #10140f;
+  --surface: #171d17;
+  --ink: #eef1ee;
+  --ink-soft: #9aa89e;
+  --rule: #262e26;
+  --rule-strong: #3a453b;
+  --accent-flow: #7c9dff;
+  --accent-flow-soft: #1c2440;
+  --accent-success: #3ddb95;
+  --accent-pending: #e0a458;
+  --accent-archived: #808a80;
+}
+
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 
@@ -45,6 +59,39 @@ body {
   background-size: 22px 22px;
   background-position: -11px -11px;
 }
+
+/* ---------- live background canvas ----------
+   A quiet, original animation in the site's own register: a loose graph of
+   nodes drifting with occasional pulses traveling between them, echoing data
+   moving through a pipeline. Sits behind everything, respects reduced-motion,
+   and is purely decorative — the dot-grid CSS above is the no-JS fallback. */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 1.1s ease;
+}
+#bg-canvas.is-ready { opacity: 1; }
+
+/* ---------- theme toggle ---------- */
+.theme-toggle {
+  font-family: var(--font-mono); font-size: .82rem;
+  background: none; border: 1px solid var(--rule-strong);
+  color: var(--ink-soft); border-radius: 999px;
+  padding: 4px 12px; cursor: pointer; line-height: 1.4;
+}
+.theme-toggle:hover { border-color: var(--accent-flow); color: var(--accent-flow); }
+
+/* ---------- email-style post header ---------- */
+.email-meta {
+  font-family: var(--font-mono); font-size: .86rem;
+  margin: 20px 0 32px; padding-bottom: 22px; border-bottom: 1px solid var(--rule);
+}
+.email-meta p { display: flex; gap: 10px; margin: 0 0 5px; }
+.email-meta-key { color: var(--ink-soft); min-width: 68px; flex-shrink: 0; }
+.email-meta-value { color: var(--ink); word-break: break-word; }
+.email-meta a { color: var(--accent-flow); }
 
 a { color: var(--accent-flow); text-decoration: none; }
 a:hover { text-decoration: underline; }

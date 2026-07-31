@@ -38,7 +38,7 @@ from xml.etree import ElementTree
 
 import yaml
 import markdown as md_lib
-from minijinja import Environment, safe, load_from_path
+from minijinja import Environment, safe
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parent
@@ -70,6 +70,13 @@ OG_DISPLAY_FONT = FONTS_DIR / "SpaceGrotesk.ttf"
 OG_MONO_FONT = FONTS_DIR / "IBMPlexMono-Medium.ttf"
 
 
+def load_template_utf8(name: str) -> str:
+    """Load templates using UTF-8 regardless of the platform default encoding."""
+    candidate = (TEMPLATES_DIR / name).resolve()
+    candidate.relative_to(TEMPLATES_DIR.resolve())
+    return candidate.read_text(encoding="utf-8")
+
+
 # ---------------------------------------------------------------- content --
 
 def parse_frontmatter(raw: str) -> tuple[dict[str, Any], str]:
@@ -86,6 +93,20 @@ def render_markdown(text: str) -> str:
     if not text:
         return ""
     return md_lib.markdown(text, extensions=["extra", "sane_lists"])
+
+
+EMAIL_ANGLE_RE = re.compile(r"<([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})>")
+
+
+def linkify_email_header(value: str) -> str:
+    """Turn `Name <email@domain>` into a mailto-linked version for the
+    email-style post header (Date/From/To/Subject)."""
+    if not value:
+        return ""
+    return EMAIL_ANGLE_RE.sub(
+        lambda m: f'&lt;<a href="mailto:{m.group(1)}">{m.group(1)}</a>&gt;',
+        value,
+    )
 
 
 def parse_entry_date(date_str: str) -> datetime | None:
@@ -134,7 +155,7 @@ def iter_markdown_files() -> list[Path]:
     return files
 
 
-def collect_entries(folder: str, tag_field: bool = False) -> list[dict[str, Any]]:
+def collect_entries(folder: str, tag_field: bool = False, date_format: str = "%b %Y") -> list[dict[str, Any]]:
     """Collect dated markdown entries from a folder (projects/ or posts/)."""
     entries_dir = ROOT / folder
     if not entries_dir.exists():
@@ -153,7 +174,7 @@ def collect_entries(folder: str, tag_field: bool = False) -> list[dict[str, Any]
             "title": frontmatter.get("title", md_path.stem),
             "description": frontmatter.get("description", ""),
             "date": frontmatter.get("date", ""),
-            "date_day": parsed_date.strftime("%b %Y") if parsed_date else "",
+            "date_day": parsed_date.strftime(date_format) if parsed_date else "",
             "date_iso": parsed_date.date().isoformat() if parsed_date else "",
             "parsed_date": parsed_date,
             "subject": frontmatter.get("subject", ""),
@@ -333,10 +354,10 @@ def build_to(build_dir: Path) -> None:
         shutil.copytree(STATIC_DIR, build_dir / "static")
         print(f"  copied static assets", flush=True)
 
-    env = Environment(loader=load_from_path(str(TEMPLATES_DIR)))
+    env = Environment(loader=load_template_utf8)
 
-    projects = collect_entries("projects", tag_field=True)
-    posts = collect_entries("posts", tag_field=False)
+    projects = collect_entries("projects", tag_field=True, date_format="%b %Y")
+    posts = collect_entries("posts", tag_field=False, date_format="%d %b %Y")
     all_tags = sorted({t for p in projects for t in p.get("tags", [])})
 
     md_files = iter_markdown_files()
@@ -351,15 +372,20 @@ def build_to(build_dir: Path) -> None:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         slug = slug_for_path(md_path)
 
+        is_home = slug == "/"
+        is_project_detail = str(md_path.parent.name) == "projects" and md_path.name not in IGNORED_INDEX_FILES
+        is_post_detail = str(md_path.parent.name) == "posts" and md_path.name not in IGNORED_INDEX_FILES
+
         page = dict(frontmatter)
         if "date" in page:
             parsed = parse_entry_date(page.get("date", ""))
             if parsed:
-                page["date_day"] = parsed.strftime("%b %Y")
+                page["date_day"] = parsed.strftime("%a, %d %b %Y") if is_post_detail else parsed.strftime("%b %Y")
 
-        is_home = slug == "/"
-        is_project_detail = str(md_path.parent.name) == "projects" and md_path.name not in IGNORED_INDEX_FILES
-        is_post_detail = str(md_path.parent.name) == "posts" and md_path.name not in IGNORED_INDEX_FILES
+        if is_post_detail:
+            default_from = f"{SITE_NAME} <hello@yashtekavade.dev>"
+            page["from_html"] = safe(linkify_email_header(str(page.get("from", default_from))))
+            page["to"] = page.get("to", "You")
 
         og_image_rel = f"static/og{slug.rstrip('/')}.png" if slug != "/" else "static/og/home.png"
         kicker = "project" if is_project_detail else "post" if is_post_detail else "portfolio"
@@ -386,7 +412,7 @@ def build_to(build_dir: Path) -> None:
             page_classes="",
             current_year=current_year,
         )
-        output_path.write_text(rendered)
+        output_path.write_text(rendered, encoding="utf-8")
         print(f"  {md_path.relative_to(ROOT)} -> {output_path.relative_to(build_dir)}", flush=True)
 
     write_feeds(posts, build_dir)
@@ -446,9 +472,12 @@ class LiveReloadHandler(SimpleHTTPRequestHandler):
                     self.wfile.write(b"data: reload\n\n")
                     self.wfile.flush()
                     break
-                self.wfile.write(b": keepalive\n\n")
-                self.wfile.flush()
-        except (BrokenPipeError, ConnectionResetError):
+                try:
+                    self.wfile.write(b": keepalive\n\n")
+                    self.wfile.flush()
+                except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError, OSError):
+                    break
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError, OSError):
             pass
         finally:
             with RELOAD_EVENTS_LOCK:
