@@ -1,4 +1,4 @@
 minijinja
 pyyaml
 markdown
-pillow
+Pillow==11.3.0

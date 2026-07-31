@@ -165,7 +165,7 @@ def collect_entries(folder: str, tag_field: bool = False, date_format: str = "%b
     for md_path in sorted(entries_dir.glob("*.md")):
         if md_path.name in IGNORED_INDEX_FILES:
             continue
-        raw = md_path.read_text()
+        raw = md_path.read_text(encoding="utf-8")
         frontmatter, body = parse_frontmatter(raw)
         parsed_date = parse_entry_date(frontmatter.get("date", ""))
 
@@ -364,7 +364,7 @@ def build_to(build_dir: Path) -> None:
     current_year = datetime.now().year
 
     for md_path in md_files:
-        raw = md_path.read_text()
+        raw = md_path.read_text(encoding="utf-8")
         frontmatter, body = parse_frontmatter(raw)
         template_name = frontmatter.get("template", "page") + ".html"
         html_body = render_markdown(body)
