@@ -2,3 +2,5 @@ minijinja
 pyyaml
 markdown
 Pillow==11.3.0
+watchdog
+
