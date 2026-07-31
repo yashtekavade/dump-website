@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="wrap">
+  <h1>{{ page.get("title", title) }}</h1>
+  <article class="content">{{ content }}</article>
+</div>
+{% endblock %}

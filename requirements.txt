@@ -1,0 +1,4 @@
+minijinja
+pyyaml
+markdown
+pillow

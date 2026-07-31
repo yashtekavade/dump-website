@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="wrap">
+  <a class="back-link" href="/projects/">← all projects</a>
+  <h1>{{ page.get("title", title) }}</h1>
+  <div class="detail-meta">
+    <span class="status status--{{ page.get('status', 'active') }}"><span class="dot"></span>{{ page.get("status", "active") }}</span>
+    {% if page.get("date_day") %}<span>{{ page.get("date_day") }}</span>{% endif %}
+    {% if page.get("github") %}<a href="{{ page.get('github') }}" target="_blank" rel="noopener">source →</a>{% endif %}
+    {% if page.get("live") %}<a href="{{ page.get('live') }}" target="_blank" rel="noopener">live →</a>{% endif %}
+  </div>
+  {% if page.get("tags") %}
+  <div class="tag-row" style="margin-bottom: 28px;">{% for t in page.get("tags") %}<span class="tag">{{ t }}</span>{% endfor %}</div>
+  {% endif %}
+  <article class="content">{{ content }}</article>
+</div>
+{% endblock %}

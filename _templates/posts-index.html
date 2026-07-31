@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="wrap">
+  <h1>Posts</h1>
+  <p class="hero__role">{{ page.get("intro", "Notes on AI, data engineering, and things I'm building.") }}</p>
+  <article class="content">{{ content }}</article>
+
+  {% if posts %}
+  <div class="log">
+    {% for post in posts %}
+    <div class="log-line">
+      <div class="log-line__date">{{ post.date_day }}</div>
+      <div>
+        <h3 class="log-line__title"><a href="{{ post.slug }}">{{ post.title }}</a></h3>
+        {% if post.subject %}<p class="log-line__excerpt">{{ post.subject }}</p>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="empty-note">no posts published yet — add a markdown file under /posts/</p>
+  {% endif %}
+
+  <p style="margin-top:24px;"><a class="back-link" href="/posts/feed.atom">subscribe via RSS →</a></p>
+</div>
+{% endblock %}

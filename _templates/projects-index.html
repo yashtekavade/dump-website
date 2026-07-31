@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="wrap wrap--wide">
+  <h1>Projects</h1>
+  <p class="hero__role">{{ page.get("intro", "A log of things I've built — filter by stack.") }}</p>
+
+  {% if all_tags %}
+  <div class="filter-bar" id="filter-bar">
+    <button class="tag-btn is-active" data-tag="all">all</button>
+    {% for t in all_tags %}<button class="tag-btn" data-tag="{{ t }}">{{ t }}</button>{% endfor %}
+  </div>
+  {% endif %}
+
+  {% if projects %}
+  <div class="job-grid" id="job-grid">
+    {% for p in projects %}
+    <div class="job-card" data-tags="{{ p.tags|join(',') }}">
+      <div class="job-card__top">
+        <h3 class="job-card__title"><a href="{{ p.slug }}">{{ p.title }}</a></h3>
+        <span class="status status--{{ p.status }}"><span class="dot"></span>{{ p.status }}</span>
+      </div>
+      <p class="job-card__desc">{{ p.description }}</p>
+      <div class="tag-row">{% for t in p.tags %}<span class="tag">{{ t }}</span>{% endfor %}</div>
+      <div class="job-card__links">
+        {% if p.github %}<a href="{{ p.github }}" target="_blank" rel="noopener">source →</a>{% endif %}
+        {% if p.live %}<a href="{{ p.live }}" target="_blank" rel="noopener">live →</a>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="empty-note">no projects published yet — add a markdown file under /projects/</p>
+  {% endif %}
+</div>
+<script src="/static/js/filter.js"></script>
+{% endblock %}

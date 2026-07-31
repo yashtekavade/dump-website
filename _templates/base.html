@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ title }}{% if title != site_name %} — {{ site_name }}{% endif %}</title>
+<meta name="description" content="{{ description }}">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{ title }}">
+<meta property="og:description" content="{{ description }}">
+<meta property="og:image" content="{{ og_image }}">
+<meta property="og:url" content="{{ canonical_url }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ title }}">
+<meta name="twitter:description" content="{{ description }}">
+<meta name="twitter:image" content="{{ og_image }}">
+
+<link rel="alternate" type="application/atom+xml" title="{{ site_name }} — Posts" href="/posts/feed.atom">
+<link rel="alternate" type="application/rss+xml" title="{{ site_name }} — Posts" href="/posts/feed.rss">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="{{ page_classes }}">
+<header class="site-header">
+  <div class="site-header__row">
+    <a class="wordmark" href="/"><span class="dot">●</span> yash@tekavade</a>
+    <nav class="site-nav">
+      <a href="/"{% if slug == "/" %} class="is-active"{% endif %}>home</a>
+      <a href="/projects/"{% if is_projects_section %} class="is-active"{% endif %}>projects</a>
+      <a href="/posts/"{% if is_posts_section %} class="is-active"{% endif %}>blog</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+{% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer__row">
+    <span>© {{ current_year }} Yashvardhan Tekavade — built with a hand-rolled static site generator</span>
+    <span class="footer-links">
+      <a href="https://github.com/yashtekavade" target="_blank" rel="noopener">github</a>
+      <a href="https://yashtekavade.substack.com" target="_blank" rel="noopener">substack</a>
+      <a href="/posts/feed.atom">rss</a>
+    </span>
+  </div>
+</footer>
+</body>
+</html>
