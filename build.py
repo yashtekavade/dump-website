@@ -39,7 +39,12 @@ from xml.etree import ElementTree
 import yaml
 import markdown as md_lib
 from minijinja import Environment, safe
-from PIL import Image, ImageDraw, ImageFont
+try:
+    from PIL import Image, ImageDraw, ImageFont
+    PIL_AVAILABLE = True
+except Exception as e:
+    print(f"Warning: Pillow unavailable ({e}). Skipping OG image generation.")
+    PIL_AVAILABLE = False
 
 ROOT = Path(__file__).resolve().parent
 TEMPLATES_DIR = ROOT / "_templates"
@@ -389,7 +394,11 @@ def build_to(build_dir: Path) -> None:
 
         og_image_rel = f"static/og{slug.rstrip('/')}.png" if slug != "/" else "static/og/home.png"
         kicker = "project" if is_project_detail else "post" if is_post_detail else "portfolio"
-        generate_og_image(frontmatter.get("title", SITE_NAME), kicker, build_dir / og_image_rel)
+        if PIL_AVAILABLE:
+            generate_og_image(...)
+            og_image_url = SITE_URL.rstrip("/") + "/" + og_image_rel
+        else:
+            og_image_url = SITE_URL.rstrip("/") + "/static/default-og.png"
         og_image_url = SITE_URL.rstrip("/") + "/" + og_image_rel
         canonical_url = SITE_URL.rstrip("/") + slug
 
