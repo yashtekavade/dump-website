@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="wrap">
+  <section class="about-hero">
+    <div class="avatar">
+      {% if page.get("photo") %}
+      <img src="{{ page.get('photo') }}" alt="{{ page.get('name', title) }}" onerror="this.style.display='none';">
+      {% endif %}
+      <span class="avatar__initials">{{ page.get("initials", "YT") }}</span>
+    </div>
+    <div>
+      <h1>{{ page.get("name", title) }}</h1>
+      <p class="hero__role">{{ page.get("role", "") }}</p>
+    </div>
+  </section>
+
+  <article class="content">{{ content }}</article>
+
+  {% if page.get("education") %}
+  <section class="about-section">
+    <div class="section-label">education</div>
+    {% for e in page.get("education") %}
+    <div class="edu-entry">
+      <div class="edu-entry__school">{{ e.school }}</div>
+      <div class="edu-entry__detail">{{ e.detail }}</div>
+    </div>
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  {% if page.get("tech") %}
+  <section class="about-section">
+    <div class="section-label">tech</div>
+    <div class="tag-row">{% for t in page.get("tech") %}<span class="tag">{{ t }}</span>{% endfor %}</div>
+  </section>
+  {% endif %}
+
+  {% if page.get("experience") %}
+  <section class="about-section">
+    <div class="section-label">experience</div>
+    <div class="log">
+      {% for job in page.get("experience") %}
+      <div class="log-line">
+        <div class="log-line__date">{{ job.org }}</div>
+        <div>
+          <h3 class="log-line__title">{{ job.role }}</h3>
+          <p class="log-line__excerpt">{{ job.blurb }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}
