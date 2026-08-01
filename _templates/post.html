@@ -9,6 +9,9 @@
       <p><span class="email-meta-key">From:</span><span class="email-meta-value">{{ page.get("from_html", "") }}</span></p>
       <p><span class="email-meta-key">To:</span><span class="email-meta-value">{{ page.get("to", "You") }}</span></p>
       <p><span class="email-meta-key">Subject:</span><span class="email-meta-value">{{ page.get("title", title) }}</span></p>
+      {% if page.get("link") %}
+      <p><span class="email-meta-key">Link:</span><span class="email-meta-value"><a href="{{ page.get("link") }}" target="_blank" rel="noopener">Open original post</a></span></p>
+      {% endif %}
     </div>
     <div class="content">{{ content }}</div>
   </article>
